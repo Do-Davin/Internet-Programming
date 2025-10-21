@@ -1,0 +1,56 @@
+body {
+    margin: 0;
+    background: #111;
+    color: #eee;
+    font: 20px 'Press Start 2P';
+    display: grid;
+    place-items: center;
+    height: 100vh;
+}
+canvas {
+    background: #222;
+    border: 2px solid #555;
+}
+#ui {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}
+#restartBtn {
+    font: 20px 'Press Start 2P';
+    background-color: #333;
+    color: white;
+    padding: 8px 16px;
+    margin-left: 8px;
+    border-radius: 8px;
+}
+
+#restartBtn:hover {
+    background-color: #555;
+    cursor: pointer;
+}
+
+#restartBtn:active {
+    background-color: #777;
+}
+
+#startBtn {
+    font: 35px 'Press Start 2P';
+    background-color: green;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+#startBtn:hover {
+    background-color: darkgreen;
+    cursor: pointer;
+}
+
+#startBtn:active {
+    background-color: lightgreen;
+}
+
+#getStart {
+    text-align: center;
+}
