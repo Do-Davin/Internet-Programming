@@ -9,9 +9,23 @@ let score = 0;
 let running = true;
 
 // Ball & paddle
-const ball = { x: CANVAS_W / 2, y: CANVAS_H / 2, r: 10, dx: BALL_SPEED, dy: BALL_SPEED };
+const ball = { 
+    x: CANVAS_W / 2, 
+    y: CANVAS_H / 2, 
+    r: 10, 
+    dx: BALL_SPEED, 
+    dy: BALL_SPEED 
+};
 console.log(ball);
-const paddle = { x: CANVAS_W / 2 - PADDLE_W / 2, y: CANVAS_H - 40, w: PADDLE_W, h: PADDLE_H, speed: PADDLE_SPEED, dx: 0 };
+
+const paddle = { 
+    x: CANVAS_W / 2 - PADDLE_W / 2, 
+    y: CANVAS_H - 40, 
+    w: PADDLE_W, 
+    h: PADDLE_H, 
+    speed: PADDLE_SPEED, 
+    dx: 0 
+};
 console.log(paddle);
 
 // === We should have Global Variables

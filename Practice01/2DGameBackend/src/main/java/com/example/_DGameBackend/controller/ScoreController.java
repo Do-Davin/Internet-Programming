@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/scores")
-@CrossOrigin(origins = "*") // allow JS frontend to call API
+@CrossOrigin(origins = "*") 
 public class ScoreController {
 
     private final ScoreService scoreService;
