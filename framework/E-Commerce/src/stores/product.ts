@@ -8,6 +8,7 @@ export const useProductStore = defineStore('product', {
     groups: [],
     promotions: [],
   }),
+
   actions: {
     async fetchCategories() {
       const response = await axios.get('http://localhost:3000/api/categories').then((res) => {

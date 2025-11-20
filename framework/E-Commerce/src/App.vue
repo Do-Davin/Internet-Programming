@@ -2,47 +2,33 @@
 import PromotionComponent from "./components/PromotionComponent.vue";
 import CategoryComponent from "./components/CategoryComponent.vue";
 import { useProductStore } from './stores/product'
-const burgerImage = new URL("@/assets/burger.png", import.meta.url).href;
-const peachImage = new URL("@/assets/peach.png", import.meta.url).href;
-const kiwiImage = new URL("@/assets/kiwi.png", import.meta.url).href;
-const redAppleImage = new URL("@/assets/redApple.png", import.meta.url).href;
-const snackImage = new URL("@/assets/snack.png", import.meta.url).href;
-const blackPlumImage = new URL("@/assets/blackPlum.png", import.meta.url).href;
-const vegetableImage = new URL("@/assets/vegetable.png", import.meta.url).href;
-const headphoneImage = new URL("@/assets/headphone.png", import.meta.url).href;
-const milkImage = new URL("@/assets/milk.png", import.meta.url).href;
-const orangeImage = new URL("@/assets/orange.png", import.meta.url).href;
-const onionImage = new URL("@/assets/onion.jpg", import.meta.url).href;
-const juiceImage = new URL("@/assets/juice.png", import.meta.url).href;
-const vegetablesImage = new URL("@/assets/vegetables.jpg", import.meta.url).href;
+import { usePromotionStore } from './stores/promotion'
+// const burgerImage = new URL("@/assets/burger.png", import.meta.url).href;
 export default {
   name: "App",
+
   setup() {
     const productStore = useProductStore()
+    const promotionStore = usePromotionStore()
+
     return {
       productStore,
+      promotionStore,
     }
   },
-  async mounted() {
-    await this.productStore.fetchCategories()
-  },
+
   data() {
     return {
-      burgerImage,
-      peachImage,
-      kiwiImage,
-      redAppleImage,
-      snackImage,
-      blackPlumImage,
-      vegetableImage,
-      headphoneImage,
-      milkImage,
-      orangeImage,
-      onionImage,
-      juiceImage,
-      vegetablesImage,
+      // burgerImage,
+      activeCategory: "All",
     };
   },
+
+  async mounted() {
+    await this.productStore.fetchCategories()
+    await this.promotionStore.fetchPromotions()
+  },
+
   components: {
     CategoryComponent,
     PromotionComponent,
@@ -52,43 +38,62 @@ export default {
 
 <template>
   <div class="main-wrapper">
+
+    <div class="category-header">
+      <h2 class="category-title">Featured Categories</h2>
+
+      <div class="category-nav">
+        <span
+         class="category-item"
+         :class="{ active: activeCategory === 'All' }"
+        >
+          All
+        </span>
+
+        <span
+         v-for="category in productStore.categories"
+         :key="category['id']"
+         class="category-item"
+         :class="{ active: activeCategory === category['name'] }"
+        >
+          {{ category['name'] }}
+        </span>
+      </div>
+    </div>
+
     <div class="category-wrapper">
-      <CategoryComponent title="Burger" :product-count="14" :image="burgerImage" container-color="##F2FCE4"/>
-      <!-- <CategoryComponent title="Peach" :product-count="21" :image="peachImage" container-color="#FFFCEB"/> -->
+      <!-- <CategoryComponent title="Burger" :product-count="14" :image="burgerImage" container-color="#F2FCE4"/> -->
       <CategoryComponent
         v-for="category in productStore.categories"
         :key="category['id']"
         :title="category['name']"
         :productCount="category['productCount']"
+        :containerColor="category['color']"
         :image="'http://localhost:3000/' + category['image']"
       />
-
-      <CategoryComponent title="Organic Wiki" :product-count="17" :image="kiwiImage" container-color="#ECFFEC"/>
-      <CategoryComponent title="Red Apple" :product-count="68" :image="redAppleImage" container-color="#FEEFEA"/>
-      <CategoryComponent title="Snack" :product-count="34" :image="snackImage" container-color="#FFF3EB"/>
-      <CategoryComponent title="Black plum" :product-count="25" :image="blackPlumImage" container-color="#FFF3FF"/>
-      <CategoryComponent title="Vegetables" :product-count="65" :image="vegetableImage" container-color="#F2FCE4"/>
-      <CategoryComponent title="Headphone" :product-count="33" :image="headphoneImage" container-color="#FFFCEB"/>
-      <CategoryComponent title="Cake & Milk" :product-count="54" :image="milkImage" container-color="#F2FCE4"/>
-      <CategoryComponent title="Orange" :product-count="63" :image="orangeImage" container-color="#FFF3FF"/>
     </div>
 
     <div class="promotion-wrapper">
-      <PromotionComponent title="Everyday Fresh & Clean with Our Products" :image="onionImage" containerColor="#F0E8D5"/>
-      <PromotionComponent title="Make your Breakfast Healthy and Easy" :image="juiceImage" containerColor="#F3E8E8"/>
-      <PromotionComponent title="The best Organic Products Online" :image="vegetablesImage" containerColor="#E7EAF3"/>
+      <!-- <PromotionComponent title="Everyday Fresh & Clean with Our Products" :image="onionImage" containerColor="#F0E8D5"/> -->
+      <PromotionComponent
+       v-for="promotion in promotionStore.promotions"
+       :key="promotion['id']"
+       :title="promotion['title']"
+       :buttonText="promotion['buttonColor']"
+       :url="promotion['url']"
+       :containerColor="promotion['color']"
+       :image="'http://localhost:3000/' + promotion['image']"
+      />
     </div>
-  </div>
 
-  <br>
-
-  <div>
-    <h1>Product Categories</h1>
-    <ul>
-      <li v-for="category in productStore.categories" :key="category['id']">
-        {{ category['name'] }}
-      </li>
-    </ul>
+    <div class="product-wrapper">
+      <h1>Product Categories</h1>
+      <ul>
+        <li v-for="category in productStore.categories" :key="category['id']">
+          {{ category['name'] }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -99,14 +104,58 @@ export default {
   width: 100%;
 }
 
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.category-title {
+  font-size: 28px;
+  font-weight: 400;
+  color: #253d4e;
+  margin: 0;
+}
+
+.category-nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.category-item {
+  font-weight: 400 !important;
+  font-size: 16px;
+  color: #253d4e;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.category-item:hover {
+  color: #5bb77e;
+}
+
+.category-item.active {
+  font-weight: 400;
+  color: #5bb77e;
+}
+
 .category-wrapper {
   display: flex;
   flex-direction: row;
-  gap: 25px;
   justify-content: flex-start;
+  gap: 25px;
 }
 
 .promotion-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 40px 0;
+}
+
+.product-wrapper {
   display: flex;
   justify-content: center;
   gap: 30px;
