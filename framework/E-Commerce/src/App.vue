@@ -1,6 +1,7 @@
-<script>
+<script lang="ts">
 import PromotionComponent from "./components/PromotionComponent.vue";
 import CategoryComponent from "./components/CategoryComponent.vue";
+import { useProductStore } from './stores/product'
 const burgerImage = new URL("@/assets/burger.png", import.meta.url).href;
 const peachImage = new URL("@/assets/peach.png", import.meta.url).href;
 const kiwiImage = new URL("@/assets/kiwi.png", import.meta.url).href;
@@ -16,6 +17,15 @@ const juiceImage = new URL("@/assets/juice.png", import.meta.url).href;
 const vegetablesImage = new URL("@/assets/vegetables.jpg", import.meta.url).href;
 export default {
   name: "App",
+  setup() {
+    const productStore = useProductStore()
+    return {
+      productStore,
+    }
+  },
+  async mounted() {
+    await this.productStore.fetchCategories()
+  },
   data() {
     return {
       burgerImage,
@@ -44,8 +54,16 @@ export default {
   <div class="main-wrapper">
     <div class="category-wrapper">
       <CategoryComponent title="Burger" :product-count="14" :image="burgerImage" container-color="##F2FCE4"/>
-      <CategoryComponent title="Peach" :product-count="21" :image="kiwiImage" container-color="#FFFCEB"/>
-      <CategoryComponent title="Organic Wiki" :product-count="17" :image="peachImage" container-color="#ECFFEC"/>
+      <!-- <CategoryComponent title="Peach" :product-count="21" :image="peachImage" container-color="#FFFCEB"/> -->
+      <CategoryComponent
+        v-for="category in productStore.categories"
+        :key="category['id']"
+        :title="category['name']"
+        :productCount="category['productCount']"
+        :image="'http://localhost:3000/' + category['image']"
+      />
+
+      <CategoryComponent title="Organic Wiki" :product-count="17" :image="kiwiImage" container-color="#ECFFEC"/>
       <CategoryComponent title="Red Apple" :product-count="68" :image="redAppleImage" container-color="#FEEFEA"/>
       <CategoryComponent title="Snack" :product-count="34" :image="snackImage" container-color="#FFF3EB"/>
       <CategoryComponent title="Black plum" :product-count="25" :image="blackPlumImage" container-color="#FFF3FF"/>
@@ -60,6 +78,17 @@ export default {
       <PromotionComponent title="Make your Breakfast Healthy and Easy" :image="juiceImage" containerColor="#F3E8E8"/>
       <PromotionComponent title="The best Organic Products Online" :image="vegetablesImage" containerColor="#E7EAF3"/>
     </div>
+  </div>
+
+  <br>
+
+  <div>
+    <h1>Product Categories</h1>
+    <ul>
+      <li v-for="category in productStore.categories" :key="category['id']">
+        {{ category['name'] }}
+      </li>
+    </ul>
   </div>
 </template>
 
