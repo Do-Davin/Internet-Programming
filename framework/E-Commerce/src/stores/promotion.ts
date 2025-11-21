@@ -3,9 +3,6 @@ import axios from 'axios'
 
 export const usePromotionStore = defineStore('promotion', {
   state: () => ({
-    products: [],
-    categories: [],
-    groups: [],
     promotions: [],
   }),
 

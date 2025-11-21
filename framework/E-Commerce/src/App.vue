@@ -2,36 +2,61 @@
 import PromotionComponent from "./components/PromotionComponent.vue";
 import CategoryComponent from "./components/CategoryComponent.vue";
 import { useProductStore } from './stores/product'
+import { useCategoryStore } from './stores/category'
 import { usePromotionStore } from './stores/promotion'
+import CategoryHeader from "./components/CategoryHeader.vue";
+import ProductCard from "./components/ProductCard.vue";
 // const burgerImage = new URL("@/assets/burger.png", import.meta.url).href;
+
+const mangoProduct = {
+  id: 1,
+  brand: "Hodo Foods",
+  name: "Seeds of Change Organic Quinoa, Brown, & Red Rice",
+  rating: 4.0,
+  weightLabel: "500 gram",
+  currentPrice: 2.51,
+  oldPrice: 2.8,
+  discountPercent: 17,
+  imageUrl: "../assets/products/mango.jpg",
+  quantity: 1,
+};
+
 export default {
   name: "App",
 
   setup() {
     const productStore = useProductStore()
+    const categoryStore = useCategoryStore()
     const promotionStore = usePromotionStore()
 
     return {
       productStore,
       promotionStore,
+      categoryStore,
     }
   },
 
   data() {
     return {
       // burgerImage,
-      activeCategory: "All",
+      activeTop: "All",
+      activeBottom: "All",
+
+      mangoProduct: mangoProduct,
     };
   },
 
   async mounted() {
-    await this.productStore.fetchCategories()
+    await this.productStore.fetchProducts()
+    await this.categoryStore.fetchCategories()
     await this.promotionStore.fetchPromotions()
   },
 
   components: {
     CategoryComponent,
     PromotionComponent,
+    CategoryHeader,
+    ProductCard,
   },
 };
 </script>
@@ -39,7 +64,16 @@ export default {
 <template>
   <div class="main-wrapper">
 
-    <div class="category-header">
+    <!-- Header -->
+
+    <CategoryHeader
+      title="Featured Categories"
+      :categories="categoryStore.categories"
+      :active-category="activeTop"
+      @select="activeTop = $event"
+    />
+
+    <!-- <div class="category-header">
       <h2 class="category-title">Featured Categories</h2>
 
       <div class="category-nav">
@@ -59,12 +93,13 @@ export default {
           {{ category['name'] }}
         </span>
       </div>
-    </div>
+    </div> -->
 
+    <!-- Categories Cart Section 1 -->
     <div class="category-wrapper">
       <!-- <CategoryComponent title="Burger" :product-count="14" :image="burgerImage" container-color="#F2FCE4"/> -->
       <CategoryComponent
-        v-for="category in productStore.categories"
+        v-for="category in categoryStore.categories"
         :key="category['id']"
         :title="category['name']"
         :productCount="category['productCount']"
@@ -73,6 +108,7 @@ export default {
       />
     </div>
 
+    <!-- Promotion Cart Section 2 -->
     <div class="promotion-wrapper">
       <!-- <PromotionComponent title="Everyday Fresh & Clean with Our Products" :image="onionImage" containerColor="#F0E8D5"/> -->
       <PromotionComponent
@@ -86,61 +122,43 @@ export default {
       />
     </div>
 
-    <div class="product-wrapper">
+    <!-- Product Categories Section 3 -->
+
+    <CategoryHeader
+      title="Popular Products"
+      :categories="categoryStore.categories"
+      :active-category="activeBottom"
+      @select="activeBottom = $event"
+    />
+
+    <!-- <div class="product-wrapper">
       <h1>Product Categories</h1>
       <ul>
         <li v-for="category in productStore.categories" :key="category['id']">
           {{ category['name'] }}
         </li>
       </ul>
-    </div>
+    </div> -->
+
+    <ProductCard :product="mangoProduct" />
+
   </div>
+
 </template>
 
 <style scoped>
+
+/* Main-CSS-Styles */
 .main-wrapper {
+  margin: 0;
+  padding: 0;
+  display: flex;
   flex-direction: column;
   max-width: 100%;
   width: 100%;
 }
 
-.category-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.category-title {
-  font-size: 28px;
-  font-weight: 400;
-  color: #253d4e;
-  margin: 0;
-}
-
-.category-nav {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-}
-
-.category-item {
-  font-weight: 400 !important;
-  font-size: 16px;
-  color: #253d4e;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.category-item:hover {
-  color: #5bb77e;
-}
-
-.category-item.active {
-  font-weight: 400;
-  color: #5bb77e;
-}
-
+/* Category Section 1 */
 .category-wrapper {
   display: flex;
   flex-direction: row;
@@ -148,6 +166,7 @@ export default {
   gap: 25px;
 }
 
+/* Promotion Section 2 */
 .promotion-wrapper {
   display: flex;
   justify-content: center;
@@ -155,6 +174,7 @@ export default {
   padding: 40px 0;
 }
 
+/* Product Section 3 */
 .product-wrapper {
   display: flex;
   justify-content: center;
