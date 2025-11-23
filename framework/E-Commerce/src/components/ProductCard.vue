@@ -1,25 +1,25 @@
 <template>
   <div class="product-card">
     <!-- Discount badge -->
-    <div v-if="product['discountPercent']" class="badge">
-      -{{ product['discountPercent'] }}%
+    <div v-if="promotionAsPercentage" class="badge">
+      -{{ promotionAsPercentage }}%
     </div>
 
     <!-- Product image -->
     <div class="image-wrapper">
       <img
-        :src="product['imageUrl']"
-        :alt="product['name']"
+        :src="image"
+        :alt="name"
         class="product-image"
       />
     </div>
 
     <!-- Content -->
     <div class="content">
-      <p class="brand">{{ product['brand'] }}</p>
+      <p class="brand">{{ group }}</p>
 
       <h3 class="title">
-        {{ product['name'] }}
+        {{ name }}
       </h3>
 
       <!-- Rating -->
@@ -29,26 +29,26 @@
             v-for="index in 5"
             :key="index"
             class="star"
-            :class="{ filled: index <= roundedRating }"
+            :class="{ filled: index <= Math.round(rating || 0) }"
           >
             ★
           </span>
         </div>
 
         <span class="rating-text">
-          ({{ product['rating'].toFixed ? product['rating'].toFixed(1) : product['rating'] }})
+          ({{ safeRating }})
         </span>
       </div>
 
-      <p class="weight">{{ product['weightLabel'] }}</p>
+      <p class="weight">{{ size }}</p>
 
       <!-- Price + quantity -->
       <div class="bottom-row">
         <div class="price">
-          <span class="current-price">${{ product['currentPrice'].toFixed(2) }}</span>
-          <span v-if="product['oldPrice']" class="old-price">
+          <span class="current-price">${{ safePrice }}</span>
+          <!-- <span v-if="product['oldPrice']" class="old-price">
             ${{ product['oldPrice'].toFixed(2) }}
-          </span>
+          </span> -->
         </div>
 
         <div class="qty-control">
@@ -64,40 +64,70 @@
 <script lang="ts">
 export default {
   name: "ProductCard",
-
   props: {
-    product: {
-      type: Object,
+    name: {
+      type: String,
       required: true,
     },
-
-    name: String,
-    rating: Number,
-    size: String,
-    image: String,
-    price: Number,
-    promotionAsPercentage: Number,
-    categoryId: Number,
-    instock: Number,
-    countSold: Number,
-    group: String,
+    rating: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    size: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    promotionAsPercentage: {
+      type: Number,
+      default: null,
+    },
+    categoryId: {
+      type: Number,
+      required: true,
+    },
+    instock: {
+      type: Number,
+      required: true,
+    },
+    countSold: {
+      type: Number,
+      required: true,
+    },
+    group: {
+      type: String,
+      required: true,
+    },
   },
 
   data() {
     return {
-      qty: this.product['quantity'] || 1,
+      qty: 1,
     };
   },
 
   computed: {
-    roundedRating() {
-      return Math.round(this.product['rating']);
+    safeRating() {
+      return this.rating ? this.rating.toFixed(1) : "0.0";
+    },
+    safePrice() {
+      return this.price ? this.price.toFixed(2) : "0.00";
     },
   },
 
   methods: {
     increaseQty() {
-      this.qty++;
+      if (this.qty < this.instock) {
+        this.qty++;
+      }
     },
     decreaseQty() {
       if (this.qty > 1) {

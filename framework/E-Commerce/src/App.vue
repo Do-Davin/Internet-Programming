@@ -8,18 +8,18 @@ import CategoryHeader from "./components/CategoryHeader.vue";
 import ProductCard from "./components/ProductCard.vue";
 // const burgerImage = new URL("@/assets/burger.png", import.meta.url).href;
 
-const mangoProduct = {
-  id: 1,
-  brand: "Hodo Foods",
-  name: "Seeds of Change Organic Quinoa, Brown, & Red Rice",
-  rating: 4.0,
-  weightLabel: "500 gram",
-  currentPrice: 2.51,
-  oldPrice: 2.8,
-  discountPercent: 17,
-  imageUrl: "../assets/products/mango.jpg",
-  quantity: 1,
-};
+// const mangoProduct = {
+//   id: 1,
+//   brand: "Hodo Foods",
+//   name: "Seeds of Change Organic Quinoa, Brown, & Red Rice",
+//   rating: 4.0,
+//   weightLabel: "500 gram",
+//   currentPrice: 2.51,
+//   oldPrice: 2.8,
+//   discountPercent: 17,
+//   imageUrl: "@/assets/products/mango.jpg",
+//   quantity: 1,
+// };
 
 export default {
   name: "App",
@@ -42,7 +42,7 @@ export default {
       activeTop: "All",
       activeBottom: "All",
 
-      mangoProduct: mangoProduct,
+      // mangoProduct: mangoProduct,
     };
   },
 
@@ -50,6 +50,23 @@ export default {
     await this.productStore.fetchProducts()
     await this.categoryStore.fetchCategories()
     await this.promotionStore.fetchPromotions()
+  },
+
+  methods: {
+    /**
+     * @param {string|null} image
+     * @returns {string}
+     */
+    cleanImagePath (image) {
+      if (!image) return "";
+
+      try {
+        const arr = JSON.parse(image);
+        return arr[0];
+      } catch (err) {
+        return image;
+      }
+    },
   },
 
   components: {
@@ -140,7 +157,24 @@ export default {
       </ul>
     </div> -->
 
-    <ProductCard :product="mangoProduct" />
+    <!-- <ProductCard :product="mangoProduct" /> -->
+
+    <div class="product-grid">
+      <ProductCard
+       v-for="product in productStore.products"
+       :key="product['id']"
+       :name="product['name']"
+       :rating="product['rating']"
+       :size="product['size']"
+       :image="'http://localhost:3000/' + cleanImagePath(product['image'])"
+       :price="product['price']"
+       :promotionAsPercentage="product['promotionAsPercentage']"
+       :categoryId="product['categoryId']"
+       :instock="product['instock']"
+       :countSold="product['countSold']"
+       :group="product['group']"
+      />
+    </div>
 
   </div>
 
@@ -180,5 +214,13 @@ export default {
   justify-content: center;
   gap: 30px;
   padding: 40px 0;
+}
+
+.product-grid {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  justify-items: center;
 }
 </style>
