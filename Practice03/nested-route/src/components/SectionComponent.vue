@@ -2,7 +2,7 @@
   <div class="section-wrapper">
     <div class="line"></div>
 
-    <div>This is Section {{ selectId }}</div>
+    <div>This is Section {{ selectId }} of Page {{ pageId }}</div>
   </div>
 </template>
 
@@ -12,6 +12,11 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
+const props = defineProps({
+  pageId: Number,
+})
+
+const pageId = computed(() => props.pageId)
 const selectId = computed(() => route.params.selectId)
 </script>
 

@@ -14,6 +14,9 @@ const router = createRouter({
           path: "section/:selectId",
           name: "Page1Section",
           component: SectionComponent,
+          props: {
+            pageId: 1
+          }
         },
       ],
     },
@@ -22,7 +25,14 @@ const router = createRouter({
       name: "PageTwo",
       component: () => import('@/views/PageTwo.vue'),
       children: [
-        { path: "section/:selectId", name: "Page2Section", component: SectionComponent },
+        {
+          path: "section/:selectId",
+          name: "Page2Section",
+          component: SectionComponent,
+          props: {
+            pageId: 2
+          }
+        },
       ],
     },
 
@@ -31,7 +41,14 @@ const router = createRouter({
       name: "PageThree",
       component: () => import('@/views/PageThree.vue'),
       children: [
-        { path: "section/:selectId", name: "Page3Section", component: SectionComponent },
+        {
+          path: "section/:selectId",
+          name: "Page3Section",
+          component: SectionComponent,
+          props: {
+            pageId: 3
+          }
+        },
       ],
     },
   ],
