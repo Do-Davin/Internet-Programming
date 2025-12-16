@@ -9,7 +9,7 @@ export class ApiKeyGuard implements CanActivate {
     const apiKey = req.headers['x-api-key'];
 
     
-    const validApiKey = process.env.API_KEY || 'itc-secret-key';
+    const validApiKey = process.env.API_KEY || 'itc-davin-key';
 
     if (!apiKey || apiKey !== validApiKey) {
       throw new UnauthorizedException('Invalid API key');
