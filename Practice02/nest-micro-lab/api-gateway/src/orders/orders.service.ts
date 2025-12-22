@@ -9,7 +9,7 @@ export class OrdersService {
   constructor(
     @Inject('ORDERS_SERVICE') private readonly client: ClientProxy,
     private readonly paymentsService: PaymentsService,
-    private readonly notifications: NotificationsService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   createOrder(orderDto: any) {
@@ -19,9 +19,11 @@ export class OrdersService {
       createAt: new Date().toISOString(),
     });
 
-    this.notifications.notify('order_created', {
-      order: orderDto,
-    });
+    // this.notificationsService.notify('order_created', {
+    //   order: orderDto,
+    // });
+
+    this.notificationsService.notify('email');
 
     return { status: 'Order accepted', order: orderDto };
   }

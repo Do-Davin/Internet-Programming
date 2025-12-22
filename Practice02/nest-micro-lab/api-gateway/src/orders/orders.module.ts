@@ -19,6 +19,7 @@ import { NotificationsModule } from 'src/notifications/notifications.module';
         },
       },
     ]),
+    NotificationsModule.register({ type: 'email' }),
     forwardRef(() => NotificationsModule),
   ],
   controllers: [OrdersController],

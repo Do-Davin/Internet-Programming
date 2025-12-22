@@ -1,10 +1,20 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
-import { CoreModule } from 'src/core/core.module';
+import { NotificationModuleOptions } from './notifications.interface';
 
-@Module({
-  imports: [CoreModule],
-  providers: [NotificationsService],
-  exports: [NotificationsService],
-})
-export class NotificationsModule {}
+@Module({})
+export class NotificationsModule {
+  static register(options: NotificationModuleOptions): DynamicModule {
+    return {
+      module: NotificationsModule,
+      providers: [
+        {
+          provide: 'NOTIFICATION_OPTIONS',
+          useValue: options,
+        },
+        NotificationsService,
+      ],
+      exports: [NotificationsService],
+    };
+  }
+}
