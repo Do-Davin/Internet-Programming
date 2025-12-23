@@ -3,14 +3,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdersModule } from './orders/orders.module';
 import { ReceiptsModule } from './receipts/receipts.module';
 import { PaymentsModule } from './payments/payments.module';
-import { NotificationsModule } from './notifications/notifications.module';
+import { NotificationModule } from './notifications/notifications.module';
 import { CoreModule } from './core/core.module';
 
 @Module({
   imports: [
+    NotificationModule.forRoot({
+      appName: 'API Gateway Lab',
+      defaultChannel: 'log',
+      enable: true,
+    }),
     OrdersModule,
     ReceiptsModule,
     PaymentsModule,
+    CoreModule,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -23,8 +29,6 @@ import { CoreModule } from './core/core.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    NotificationsModule,
-    CoreModule,
   ],
 })
 export class AppModule {}

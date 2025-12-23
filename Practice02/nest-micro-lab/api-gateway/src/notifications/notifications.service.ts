@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Inject, Injectable } from '@nestjs/common';
+import type {
+  NotificationChannel,
+  NotificationFeatureOptions,
+  NotificationModuleOptions,
+} from './interface';
+import {
+  NOTIFICATION_FEATURE_REGISTRY,
+  NOTIFICATION_OPTIONS,
+} from './constants';
 // import { EVENT_PUBLISHER } from 'src/core/tokens';
 
 // type EventPublisher = { publish: (event: string, payload: any) => void };
@@ -7,27 +16,44 @@ import { Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class NotificationsService {
   constructor(
-    @Inject('NOTIFICATION_OPTIONS')
-    // private readonly eventPublisher: EventPublisher,
-    private options: any,
+    @Inject(NOTIFICATION_OPTIONS)
+    private readonly options: NotificationModuleOptions,
+
+    @Inject(NOTIFICATION_FEATURE_REGISTRY)
+    private readonly features: NotificationFeatureOptions[],
   ) {}
 
-  // notify(event: string, payload: any) {
-  //   // console.log(`[NOTIFY] ${event}`, payload);
-  //   this.eventPublisher.publish(event, payload);
-  //   return { ok: true };
-  // }
-  notify(message: string) {
-    switch (this.options.type) {
-      case 'email':
-        console.log(`[Email]: ${message}`);
-        break;
-      case 'sms':
-        console.log(`[SMS]: ${message}`);
-        break;
-      case 'log':
-      default:
-        console.log(`[LOG]: ${message}`);
+  // Get feature config by name
+  private getFeature(
+    featureName: string,
+  ): NotificationFeatureOptions | undefined {
+    return this.features.find((f) => f.featureName === featureName);
+  }
+
+  // Resolve channels (feature override -> global default)
+  private resolveChannels(
+    feature?: NotificationFeatureOptions,
+  ): NotificationChannel[] {
+    if (!this.options.enable) return [];
+    if (feature?.channels?.length) return feature.channels;
+    return [this.options.defaultChannel];
+  }
+
+  notify(featureName: string, event: string, payload: any) {
+    if (!this.options.enable)
+      return { skipped: true, reason: 'notifications disabled' };
+
+    const feature = this.getFeature(featureName);
+    const channels = this.resolveChannels(feature);
+
+    const prefix = feature?.prefix ?? `[${featureName.toUpperCase()}]`;
+    const message = `${prefix} (${this.options.appName}) ${event}`;
+
+    // For lab: only log, pretend "channels"
+    for (const ch of channels) {
+      console.log(`[${ch.toUpperCase()}] ${message}`, payload);
     }
+
+    return { ok: true, channels, featureName, event };
   }
 }

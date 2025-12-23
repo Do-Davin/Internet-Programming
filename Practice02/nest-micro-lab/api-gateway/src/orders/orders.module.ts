@@ -3,7 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { PaymentsModule } from 'src/payments/payments.module';
-import { NotificationsModule } from 'src/notifications/notifications.module';
+import { NotificationModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -19,8 +19,13 @@ import { NotificationsModule } from 'src/notifications/notifications.module';
         },
       },
     ]),
-    NotificationsModule.register({ type: 'email' }),
-    forwardRef(() => NotificationsModule),
+    // NotificationModule.register({ type: 'email' }),
+    // forwardRef(() => NotificationModule),
+    NotificationModule.forFeature({
+      featureName: 'orders',
+      prefix: '[ORDERS]',
+      channels: ['log', 'telegram'], // override global default
+    }),
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

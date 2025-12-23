@@ -10,6 +10,7 @@ export class OrdersService {
     @Inject('ORDERS_SERVICE') private readonly client: ClientProxy,
     private readonly paymentsService: PaymentsService,
     private readonly notificationsService: NotificationsService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   createOrder(orderDto: any) {
@@ -23,7 +24,10 @@ export class OrdersService {
     //   order: orderDto,
     // });
 
-    this.notificationsService.notify('email');
+    this.notificationsService.notify('orders', 'order_created', {
+      order: orderDto,
+      createAt: new Date().toISOString(),
+    });
 
     return { status: 'Order accepted', order: orderDto };
   }
