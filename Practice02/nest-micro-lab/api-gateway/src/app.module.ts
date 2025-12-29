@@ -5,6 +5,8 @@ import { ReceiptsModule } from './receipts/receipts.module';
 import { PaymentsModule } from './payments/payments.module';
 import { NotificationModule } from './notifications/notifications.module';
 import { CoreModule } from './core/core.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { NotifyInterceptor } from './notifications/notify.interceptor';
 
 @Module({
   imports: [
@@ -29,6 +31,12 @@ import { CoreModule } from './core/core.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: NotifyInterceptor,
+    },
   ],
 })
 export class AppModule {}

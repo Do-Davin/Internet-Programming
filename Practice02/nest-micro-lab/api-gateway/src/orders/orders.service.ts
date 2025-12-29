@@ -10,7 +10,6 @@ export class OrdersService {
     @Inject('ORDERS_SERVICE') private readonly client: ClientProxy,
     private readonly paymentsService: PaymentsService,
     private readonly notificationsService: NotificationsService,
-    private readonly notifications: NotificationsService,
   ) {}
 
   createOrder(orderDto: any) {

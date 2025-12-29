@@ -1,13 +1,14 @@
 export type NotificationChannel = 'log' | 'email' | 'sms' | 'telegram';
 
 export interface NotificationModuleOptions {
-  appName: string; // global app name
+  appName: string;
   defaultChannel: NotificationChannel;
-  enable: boolean; // master switch
+  enable: boolean;
 }
 
 export interface NotificationFeatureOptions {
-  featureName: string; // Ex: "orders", "receipts"
-  prefix?: string; // Ex: "[ORDERS]"
-  channels?: NotificationChannel[]; // override channels for this feature
+  featureName: string;
+  channels?: NotificationChannel[];
+  prefix?: string;
+  enable?: boolean;
 }

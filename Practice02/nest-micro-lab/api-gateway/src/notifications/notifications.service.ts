@@ -35,21 +35,28 @@ export class NotificationsService {
     feature?: NotificationFeatureOptions,
   ): NotificationChannel[] {
     if (!this.options.enable) return [];
+    if (feature && feature.enable === false) return [];
     if (feature?.channels?.length) return feature.channels;
     return [this.options.defaultChannel];
   }
 
   notify(featureName: string, event: string, payload: any) {
-    if (!this.options.enable)
-      return { skipped: true, reason: 'notifications disabled' };
-
     const feature = this.getFeature(featureName);
+
+    if (feature?.enable === false)
+      return { skipped: true, reason: 'feature disabled' };
+
+    if (!this.options.enable)
+      return { skipped: true, reason: 'notifications disabled globally' };
+
     const channels = this.resolveChannels(feature);
+
+    if (channels.length === 0)
+      return { skipped: true, reason: 'no channels available' };
 
     const prefix = feature?.prefix ?? `[${featureName.toUpperCase()}]`;
     const message = `${prefix} (${this.options.appName}) ${event}`;
 
-    // For lab: only log, pretend "channels"
     for (const ch of channels) {
       console.log(`[${ch.toUpperCase()}] ${message}`, payload);
     }
