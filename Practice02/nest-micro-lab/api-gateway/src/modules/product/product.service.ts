@@ -41,7 +41,10 @@ export class ProductsService {
     page?: number;
     limit?: number;
   }) {
-    const { categoryId, minPrice, maxPrice, page = 1, limit = 10 } = query;
+    const { categoryId, minPrice, maxPrice } = query;
+
+    const pageNum = Number(query.page) || 1;
+    const limitNum = Number(query.limit) || 10;
 
     const qb = this.repo
       .createQueryBuilder('p')
@@ -51,16 +54,16 @@ export class ProductsService {
     if (minPrice) qb.andWhere('p.price >= :minPrice', { minPrice });
     if (maxPrice) qb.andWhere('p.price <= :maxPrice', { maxPrice });
 
-    qb.skip((page - 1) * limit).take(limit);
+    qb.skip((pageNum - 1) * limitNum).take(limitNum);
 
     const [data, total] = await qb.getManyAndCount();
 
     return {
       data,
       total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / limitNum),
     };
   }
 
