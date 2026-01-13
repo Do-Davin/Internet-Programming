@@ -11,9 +11,11 @@ import { CategoryModule } from './modules/category/category.module';
 import { ProductsModule } from './modules/product/product.module';
 import { ConfigModule } from '@nestjs/config';
 import { CustomersModule } from './modules/customers/customers.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     NotificationModule.forRoot({
       appName: 'API Gateway Lab',
       defaultChannel: 'log',

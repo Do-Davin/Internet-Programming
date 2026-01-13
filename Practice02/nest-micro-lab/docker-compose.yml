@@ -19,17 +19,13 @@ services:
       - "3000:3000"
     environment:
       RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASS: postgres
-      DB_NAME: order-worker
     volumes:
       - ./api-gateway:/app
       - /app/node_modules
     depends_on:
       - rabbitmq
-      - postgres
+    env_file:
+      - .env
 
   order-worker:
     build: ./order-worker
@@ -43,8 +39,24 @@ services:
     depends_on:
       - rabbitmq
 
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    command: npm run start:dev
+    ports:
+      - "3001:3000"
+    environment:
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
+  
   postgres:
-      image: postgres:16 # Version
+      image: postgres:16
       container_name: postgres
       environment:
         POSTGRES_USER: postgres
@@ -55,4 +67,4 @@ services:
       volumes:
         - pgdata:/var/lib/postgresql/data
 volumes:
-  pgdata:
+    pgdata:
