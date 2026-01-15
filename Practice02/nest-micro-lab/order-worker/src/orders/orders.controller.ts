@@ -1,16 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller } from '@nestjs/common';
-import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { Body, Controller, Delete, Post } from '@nestjs/common';
+import { OrdersService } from './orders.service';
+import { Notify } from 'src/notifications/notify.decorator';
+import { VerifyCustomerPipe } from 'src/common/pipes/verify-customer.pipe';
+import { CreateOrderDto } from './dto/create-order.dto';
 
 @Controller('orders')
 export class OrdersController {
-  @EventPattern('order_created')
-  handleOrderCreated(@Payload() data: any, @Ctx() context: RmqContext) {
-    console.log(`Received order_created event: ${JSON.stringify(data)}`);
+  constructor(private readonly ordersService: OrdersService) {}
+
+  @Post()
+  @Notify('order', 'Order Created')
+  create(
+    @Body('customer', VerifyCustomerPipe) customer: any,
+    @Body() body: CreateOrderDto,
+  ) {
+    console.log('orderController create() is called');
+    return this.ordersService.createOrder({
+      ...body,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      customer,
+    });
   }
 
-  @EventPattern('order_deleted')
-  handleOrderDeleted(@Payload() data: any, @Ctx() context: RmqContext) {
-    console.log('incoming message: order_deleted');
+  @Delete()
+  delete() {
+    console.log('Delete order!');
+    return this.ordersService.deleteOrder();
   }
 }

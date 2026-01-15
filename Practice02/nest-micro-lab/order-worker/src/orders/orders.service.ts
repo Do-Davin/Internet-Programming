@@ -1,19 +1,38 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { Injectable, Logger } from '@nestjs/common';
-import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { PaymentsService } from 'src/payments/payments.service';
 
 @Injectable()
 export class OrdersService {
-  private readonly logger = new Logger(OrdersService.name);
-  private readonly processedOrders: any[] = []; // simple "DB"
+  constructor(
+    @Inject('ORDERS_SERVICE') private readonly client: ClientProxy,
+    private readonly paymentsService: PaymentsService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
-  // Optional: method to view "DB" in logs
-  printAll() {
-    this.logger.log(
-      `All processed orders: ${JSON.stringify(this.processedOrders)}`,
-    );
+  createOrder(orderDto: any) {
+    console.log('emit order_created');
+    this.client.emit('order_created', {
+      order: orderDto,
+      createAt: new Date().toISOString(),
+    });
+
+    // this.notificationsService.notify('order_created', {
+    //   order: orderDto,
+    // });
+
+    this.notificationsService.notify('orders', 'order_created', {
+      order: orderDto,
+      createAt: new Date().toISOString(),
+    });
+
+    return { status: 'Order accepted', order: orderDto };
+  }
+
+  deleteOrder() {
+    this.client.emit('order_deleted', '');
+    return { status: 'Order deleted' };
   }
 }
