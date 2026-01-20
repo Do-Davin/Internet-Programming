@@ -8,6 +8,7 @@ import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Category } from '../category/entities/category.entity';
 import { Repository } from 'typeorm';
+import { CreateProductInput } from 'src/graphql/inputs/create-product.input';
 
 @Injectable()
 export class ProductsService {
@@ -17,6 +18,24 @@ export class ProductsService {
   ) {}
 
   async create(dto: CreateProductDto) {
+    const cat = await this.repo.manager.findOne(Category, {
+      where: { id: dto.categoryId },
+    });
+
+    if (!cat) throw new NotFoundException('Category not found');
+
+    try {
+      const product = this.repo.create(dto);
+      return await this.repo.save(product);
+    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (e.code === '23505')
+        throw new BadRequestException('SKU already exists');
+      throw e;
+    }
+  }
+
+  async createProductCodeFirst(dto: CreateProductInput) {
     const cat = await this.repo.manager.findOne(Category, {
       where: { id: dto.categoryId },
     });
@@ -65,6 +84,12 @@ export class ProductsService {
       limit: limitNum,
       totalPages: Math.ceil(total / limitNum),
     };
+  }
+
+  async findAllProducts(): Promise<Product[]> {
+    return await this.repo.find({
+      relations: ['category'],
+    });
   }
 
   async findOne(id: string) {
